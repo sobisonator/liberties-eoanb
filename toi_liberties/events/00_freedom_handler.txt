@@ -1,0 +1,159 @@
+﻿add_namespace = freedom_handler
+
+news_event = {
+	id = freedom_handler.0
+	picture = GFX_report_event_election_vote
+	
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+
+		# Give every country a set of modifiable freedom values if they haven't already.
+		# Useful for first-time setup or newly independent nations
+		every_country = {
+			if = {
+				limit = {
+					NOT = {
+						has_country_flag = modified_freedom_set
+					}
+				}
+				set_variable = {
+					var = modified_liberty
+					value = 0
+				}
+				set_variable = {
+					var = modified_consciousness
+					value = 0
+				}
+				set_country_flag = modified_freedom_set
+			}
+		}
+
+		news_event = {
+			# Get liberty level
+			id = freedom_index.0
+		}
+
+		news_event = {
+			# Get consciousness level
+			id = freedom_index.1
+		}
+
+		news_event = {
+			#Fire the freedom handler repeater event again in 30 days
+			id = freedom_handler.1
+		}
+
+		news_event = {
+			#Fire the check for the agitation for liberty event chain every year in all countries
+			id = freedom_handler.2
+		}
+
+		every_country = {
+			# Get a random freedom event, or no event at all
+			# First of all, set a flag that it's awaiting a freedom event. Don't queue up more than one freedom event
+			# When triggered, freedom events will remove this flag and clear the way for another one to be queued
+			# Do not trigger this in pre-industrial nations
+			if = {
+				limit = {
+					NOT = {
+						has_idea = pre_industrial_era
+					}
+				}
+				set_country_flag = awaiting_freedom_event
+				country_event = {
+					# This event immediately triggers a random freedom event
+					id = freedom_handler.3
+					days = 1
+					# Anywhere between 1 day and 6 months away
+					random = 4380
+				}
+			}
+		}
+
+	}
+}
+
+news_event = {
+	id = freedom_handler.1
+	picture = GFX_report_event_election_vote
+	
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {	
+		random_country = {
+			news_event = {
+				#Fire the freedom handler again in 30 days
+				id = freedom_handler.0
+				days = 30
+			}
+		}
+	}
+}
+
+news_event = {
+	id = freedom_handler.2
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+		every_country = {
+			# Check if the agitation for liberty chain can begin, and if so give it a random tick down
+			country_event = {
+				id = agitation_chain.2
+			}
+			# Fire the check again next year
+			country_event = {
+				id = agitation_chain.2
+				days = 365
+			}
+		}
+	}
+}
+
+country_event = {
+	id = freedom_handler.3
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+		clr_country_flag = awaiting_freedom_event
+
+		# Determine weights for events - all freedom related events must be listed here
+
+		# CHANCE FOR ABOLITIONIST GROUP
+		# Chance = If country has slavery, 1 x consciousness disparity (min. 1)
+		if = {
+			limit = {
+				OR = {
+					has_idea = tribal_slavery
+					has_idea = slavery
+				}
+			}
+			set_temp_variable = { chance_abolitionist_grp = 1 }
+		}
+		multiply_temp_variable = { chance_abolitionist_grp = consciousness_disparity }
+
+		random_list = {
+			10 = {
+				# Nothing happens
+				add_stability = 0.01
+			}
+
+			# ABOLITIONIST GROUP
+			chance_abolitionist_grp = {
+				country_event = freedom_events.0
+			}
+		}
+	}
+}

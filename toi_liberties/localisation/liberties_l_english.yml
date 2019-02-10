@@ -1,0 +1,6 @@
+﻿l_english:
+  idea_agitation_for_liberty:0 "Agitation for liberty"
+  idea_agitation_for_liberty_desc:0 "The [Root.GetAdjective] people are clamouring in support of their liberties."
+  agitation_chain.0.a:0 "We must suppress this dangerous movement"
+  agitation_chain.0.b:0 "We must bide our time..."
+  agitation_chain.0.c:0 "Express support for the movement!"

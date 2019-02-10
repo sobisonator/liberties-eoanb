@@ -1,0 +1,162 @@
+add_namespace = agitation_chain
+
+# Set up the random occurence of the agitation event
+# Instead of using MTTH, trigger it in a random number of days with a bottom limit
+# With the bottom limit decreased by having more of the factors.
+# This event is triggered by on_action
+country_event = {
+	id = agitation_chain.2
+
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+
+		# Check yearly if this country is eligible to receive the Liberty Agitation event chain starter
+		if = {
+			limit = {
+				NOT = {
+					# Make sure effects of this yearly event are not already underway
+					has_idea = idea_agitation_for_liberty
+					has_country_flag = agitation_incoming
+					# Consciousness must be above liberty for this to proceed
+					check_variable = { consciousness < liberty }
+				}
+
+			}
+
+			# Create a minimum number of days before which the event can trigger
+			set_temp_variable = { minimum_random_days = 1 }
+
+			# Simulate MTTH with minimum and maximum values for a semi-random window of time.
+
+			set_temp_variable = { negative_con = consciousness }
+			subtract_from_temp_variable = { negative_con = 100 }
+			multiply_temp_variable = { negative_con = -1 }
+			set_temp_variable = { four_x_negative_con = negative_con }
+			multiply_temp_variable = { four_x_negative_con = 4 }
+			# e.g. if consciousness = 99, this adds 4 to minimum days to trigger
+			# If consciousness is only 1, this adds 396 to min. days to trigger
+
+			add_to_temp_variable = { minimum_random_days = four_x_negative_con }
+
+			divide_temp_variable = { minimum_random_days = stability }
+
+			# Modify the random hours added on top
+			# Base value is 175,200 hours or 20 years
+			set_temp_variable = { maximum_random_hours = 175200 }
+
+			# Now all multipliers below act like MTTH modifiers
+
+			# Modify maximum time to happen by consciousness
+			set_temp_variable = { con_mtth_modifier = negative_con }
+			divide_temp_variable = { con_mtth_modifier = 100 }
+			# e.g. turn 44 (from a consciousness of 66) into 0.44
+
+			multiply_temp_variable = { maximum_random_hours = con_mtth_modifier }
+
+			# Modify maximum time to happen by consciousness disparity
+			set_temp_variable = { con_disparity_mtth_modifier = consciousness_disparity }
+			divide_temp_variable = { con_disparity_mtth_modifier = 100 }
+
+			multiply_temp_variable = { maximum_random_hours = con_disparity_mtth_modifier }
+
+			multiply_temp_variable = { maximum_random_hours = stability }
+
+			#add flag agitation_incoming
+			set_country_flag = agitation_incoming
+
+			country_event = {
+				# Trigger the agitation event in a random number of days
+				days = minimum_random_days
+				random = maximum_random_hours
+				id = agitation_chain.0
+			}
+		}
+			
+
+}
+
+# Agitation for liberty - triggers the availability of event chains relating to freedom
+country_event = {
+	id = agitation_chain.0
+
+	# Placeholder
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+
+	immediate = {
+
+		#remove flag agitation_incoming
+		clr_country_flag = agitation_incoming
+
+		add_timed_idea = {
+			# Over the next 5 years, there will be opportunities for agitation event chains
+			idea = idea_agitation_for_liberty
+			days = 1825
+		}
+
+		add_stability = -0.05
+
+		country_event = {
+			# Event to choose from a random list of event chains
+			id = agitation_chain.1
+			days = 5
+			# From 0-744 hours extra (1 month's variance)
+			random = 744
+		}
+
+	}
+
+	# Select a response
+	# Response will determine the likelihood and nature of the proceeding event chains
+
+	# We must suppress this movement
+	option = {
+		name = agitation_chain.0.a
+		add_political_power = -100
+	}
+
+	# We must bide our time
+	option = {
+		name = agitation_chain.0.b
+		add_stability = -0.05
+	}
+
+	# Express support for the movement
+	option = {
+		name = agitation_chain.0.c
+		add_stability = -0.1
+		add_political_power = 75
+	}
+
+	trigger = {
+		# Will only fire if consciousness is greater than liberty
+		check_variable = { consciousness > liberty }
+		# Is not already in an agitation period
+		NOT = {
+			has_idea = idea_agitation_for_liberty
+		}
+	}
+}
+
+# Semi-randomly determine an event chain path for the agitation
+# Currently WiP
+country_event = {
+	id = agitation_chain.1
+
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	immediate = {
+
+	}
+}

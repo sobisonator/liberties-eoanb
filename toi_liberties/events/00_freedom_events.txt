@@ -1,0 +1,11 @@
+add_namespace = freedom_events
+
+# Abolitionist group - anti slavery event
+country_event = {
+	id = freedom_events.0
+
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+}
